@@ -1,0 +1,9 @@
+CHIP Nand2Dmux {
+    IN in, sel;
+    OUT a, b;
+
+    PARTS:
+    Not(in = sel, out = nsel);
+    And(a = in, b = nsel, out = a);
+    And(a = sel, b = in, out = b);
+}
