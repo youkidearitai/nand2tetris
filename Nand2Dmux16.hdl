@@ -1,0 +1,22 @@
+CHIP Nand2Dmux16 {
+    IN in[16], sel;
+    OUT a[16], b[16];
+
+    PARTS:
+    DMux(in = in[0],  sel = sel, a = a[0],  b = b[0]);
+    DMux(in = in[1],  sel = sel, a = a[1],  b = b[1]);
+    DMux(in = in[2],  sel = sel, a = a[2],  b = b[2]);
+    DMux(in = in[3],  sel = sel, a = a[3],  b = b[3]);
+    DMux(in = in[4],  sel = sel, a = a[4],  b = b[4]);
+    DMux(in = in[5],  sel = sel, a = a[5],  b = b[5]);
+    DMux(in = in[6],  sel = sel, a = a[6],  b = b[6]);
+    DMux(in = in[7],  sel = sel, a = a[7],  b = b[7]);
+    DMux(in = in[8],  sel = sel, a = a[8],  b = b[8]);
+    DMux(in = in[9],  sel = sel, a = a[9],  b = b[9]);
+    DMux(in = in[10], sel = sel, a = a[10], b = b[10]);
+    DMux(in = in[11], sel = sel, a = a[11], b = b[11]);
+    DMux(in = in[12], sel = sel, a = a[12], b = b[12]);
+    DMux(in = in[13], sel = sel, a = a[13], b = b[13]);
+    DMux(in = in[14], sel = sel, a = a[14], b = b[14]);
+    DMux(in = in[15], sel = sel, a = a[15], b = b[15]);
+}
