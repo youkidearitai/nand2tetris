@@ -1,0 +1,26 @@
+CHIP Nand2Inc16 {
+    IN in[16];
+    OUT out[16];
+
+    PARTS:
+    Not(in = in[0], out = innot);
+    And(a = in[0], b = innot, out = mustzero);
+    Not(in = mustzero, out = mustone);
+
+    HalfAdder(a = in[0],  b = mustone,  carry = carry0,  sum = out[0]);
+    FullAdder(a = in[1],  b = mustzero,  c =  carry0,  carry = carry1,  sum = out[1]);
+    FullAdder(a = in[2],  b = mustzero,  c =  carry1,  carry = carry2,  sum = out[2]);
+    FullAdder(a = in[3],  b = mustzero,  c =  carry2,  carry = carry3,  sum = out[3]);
+    FullAdder(a = in[4],  b = mustzero,  c =  carry3,  carry = carry4,  sum = out[4]);
+    FullAdder(a = in[5],  b = mustzero,  c =  carry4,  carry = carry5,  sum = out[5]);
+    FullAdder(a = in[6],  b = mustzero,  c =  carry5,  carry = carry6,  sum = out[6]);
+    FullAdder(a = in[7],  b = mustzero,  c =  carry6,  carry = carry7,  sum = out[7]);
+    FullAdder(a = in[8],  b = mustzero,  c =  carry7,  carry = carry8,  sum = out[8]);
+    FullAdder(a = in[9],  b = mustzero,  c =  carry8,  carry = carry9,  sum = out[9]);
+    FullAdder(a = in[10], b = mustzero, c =  carry9,  carry = carry10, sum = out[10]);
+    FullAdder(a = in[11], b = mustzero, c =  carry10, carry = carry11, sum = out[11]);
+    FullAdder(a = in[12], b = mustzero, c =  carry11, carry = carry12, sum = out[12]);
+    FullAdder(a = in[13], b = mustzero, c =  carry12, carry = carry13, sum = out[13]);
+    FullAdder(a = in[14], b = mustzero, c =  carry13, carry = carry14, sum = out[14]);
+    FullAdder(a = in[15], b = mustzero, c =  carry14, carry = carry15, sum = out[15]);
+}
