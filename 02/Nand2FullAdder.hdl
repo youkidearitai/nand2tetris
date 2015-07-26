@@ -1,0 +1,14 @@
+CHIP Nand2FullAdder {
+    IN a, b, c;
+    OUT sum, carry;
+
+    PARTS:
+    And(a = b, b = c, out = bccarry);
+    Xor(a = b, b = c, out = bcsum);
+
+    Not(in = bcsum, out = nbcsum);
+    Or(a = b, b = c, out = orbccarry);
+
+    Mux(a = bcsum, b = nbcsum, sel = a, out = sum);
+    Mux(a = bccarry, b = orbccarry, sel = a, out = carry);
+}
