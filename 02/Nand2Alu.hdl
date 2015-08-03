@@ -1,0 +1,39 @@
+CHIP Nand2Alu {
+    IN x[16], y[16],
+       zx, nx, zy, ny, f, no;
+    OUT out[16], zr, ng;
+
+    PARTS:
+    // if zx then x = 0
+    Mux16(a = x, b[0..15] = false, sel = zx, out = ozx);
+
+    // if nx then x = !x
+    Not16(in = ozx, out = nnx);
+    Mux16(a = ozx, b = nnx, sel = nx, out = exx);
+
+    // if zy then y = 0
+    Mux16(a = y, b[0..15] = false, sel = zy, out = ozy);
+
+    // if ny then y = !y
+    Not16(in = ozy, out = nny);
+    Mux16(a = ozy, b = nny, sel = ny, out = exy);
+
+    // if f then out = x + y
+    //      else out = x & y
+    Add16(a = exx, b = exy, out = xplusy);
+    And16(a = exx, b = exy, out = xandy);
+    Mux16(a = xandy, b = xplusy, sel = f, out = fxy);
+
+    // if no then out = !out
+    Not16(in = fxy, out = nfxy);
+    Mux16(a = fxy, b = nfxy, sel = no, out[0..7] = ret0, out[8..14] = ret1, out[15] = retsign, out = out);
+
+    Or8Way(in[0..7] = ret0, out = ret0is0);
+    Or8Way(in[0..6] = ret1, in[7] = retsign, out = ret1is0);
+
+    Or(a = ret0is0, b = ret1is0, out = yzr);
+    Not(in = yzr, out = zr);
+
+    // if out < 0 then ng = 1 else ng = 0
+    And(a = retsign, b = true, out = ng);
+}
