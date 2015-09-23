@@ -1,11 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
+
+A_COMMAND = 1
+C_COMMAND = 2
+L_COMMAND = 3
+
 class Parser:
     """Parserモジュール
 
     各アセンブリコマンドをその基本要素（フィールドとシンボル）に分解する
     """
+
+    stream = None
+
+    nowline = '\n'
+
     def __init__(self, stream):
         """入力ファイル/ストリームを開きパースを行う準備をする
 
@@ -15,7 +26,7 @@ class Parser:
         Return value:
         インスタンス
         """
-        pass
+        self.stream = stream
 
     def hasMoreCommands(self):
         """
@@ -24,7 +35,7 @@ class Parser:
         Return value:
         bool -- 入力にまだコマンドが存在するか
         """
-        pass
+        return self.nowline != '' # 空文字列だともうない。空行の場合は\nが入るため
 
     def advance(self):
         """
@@ -32,7 +43,8 @@ class Parser:
         このルーチンはhasMoreCommands()がtrueの場合のみ
         呼ぶようにする。最初は現コマンドは空である。
         """
-        pass
+        self.nowline = self.stream.readline().strip(' ')
+        return self.nowline
 
     def commandType(self):
         """
@@ -44,7 +56,22 @@ class Parser:
         Return value:
         [ACL]_COMMAND
         """
-        pass
+        symbol = re.search('^\\@[a-zA-Z0-9]+', self.nowline)
+        if symbol is not None:
+            return A_COMMAND
+
+        c_command = re.search(
+            '^(([AMD]{1,3})=)?([-!]?[AMD])([-+&|])?([01AMD])?(;J[GELNM][TQETP])?$',
+            self.nowline
+        )
+        if c_command is not None:
+            return C_COMMAND
+
+        l_command = re.search('^\([a-zA-Z0-9]+\)$', self.nowline)
+        if l_command is not None:
+            return L_COMMAND
+
+        raise NotCommandErrorException(self.nowline)
 
     def symbol(self):
         """
@@ -84,3 +111,7 @@ class Parser:
         呼ぶようにする。
         """
         pass
+
+class NotCommandErrorException(Exception):
+    pass
+
