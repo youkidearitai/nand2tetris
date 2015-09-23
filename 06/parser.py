@@ -31,6 +31,9 @@ class Parser:
     # L_COMMANDの正規表現
     l_comand_rex = None
 
+    # 無視する文字列の正規表現
+    delete_rex = None
+
     def __init__(self, stream):
         """入力ファイル/ストリームを開きパースを行う準備をする
 
@@ -47,6 +50,7 @@ class Parser:
             '^(([AMD]{1,3})=)?([-!]?[AMD01])([-+&|])?([01AMD])?(;)?(J[GELNM][TQETP])?$'
         )
         self.l_comand_rex = re.compile('^\(([a-zA-Z0-9]+)\)$')
+        self.delete_rex = re.compile('(?://.*| )')
 
     def hasMoreCommands(self):
         """
@@ -63,7 +67,7 @@ class Parser:
         このルーチンはhasMoreCommands()がtrueの場合のみ
         呼ぶようにする。最初は現コマンドは空である。
         """
-        self.nowline = self.stream.readline().strip(' ')
+        self.nowline = self.delete_rex.sub("", self.stream.readline())
         return self.nowline
 
     def commandType(self):
@@ -87,8 +91,6 @@ class Parser:
         self.command_type = self.l_comand_rex.match(self.nowline)
         if self.command_type is not None:
             return L_COMMAND
-
-        raise NotCommandErrorException(self.nowline)
 
     def symbol(self):
         """
