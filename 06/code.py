@@ -39,12 +39,32 @@ class Code:
         """
         pass
 
-    def jump(self):
+    def jump(self, mnemonic):
         """
         jumpニーモニックのバイナリコードを返す
 
         Keyword arguments:
         mnemonic - ニーモニック(文字列)
         """
-        pass
+        binary = 0b000
+
+        if mnemonic is None:
+            return binary
+
+        if mnemonic == "JMP":
+            return 0b111
+
+        if "JG" in mnemonic:
+            binary = binary + 0b001
+
+        if "JL" in mnemonic:
+            binary = binary + 0b100
+
+        if "E" in mnemonic:
+            if mnemonic == "JNE":
+                return 0b101
+
+            binary = binary + 0b010
+
+        return binary
 
