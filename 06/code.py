@@ -14,7 +14,21 @@ class Code:
         Keyword arguments:
         mnemonic - ニーモニック(文字列)
         """
-        pass
+        binary = 0b000
+
+        if mnemonic is None:
+            return binary
+
+        if 'M' in mnemonic:
+            binary = binary + 0b001
+
+        if 'D' in mnemonic:
+            binary = binary + 0b010
+
+        if 'A' in mnemonic:
+            binary = binary + 0b100
+
+        return binary
 
     def comp(self, mnemonic):
         """
