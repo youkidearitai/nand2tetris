@@ -37,7 +37,92 @@ class Code:
         Keyword arguments:
         mnemonic - ニーモニック(文字列)
         """
-        pass
+        if "M" in mnemonic:
+            if mnemonic == "M":
+                return 0b1110000
+
+            if mnemonic == "!M":
+                return 0b1110001
+
+            if mnemonic == "-M":
+                return 0b1110011
+
+            if mnemonic == "M+1":
+                return 0b1110111
+
+            if mnemonic == "M-1":
+                return 0b1110010
+
+            if mnemonic == "D+M":
+                return 0b1000010
+
+            if mnemonic == "D-M":
+                return 0b1000010
+
+            if mnemonic == "M-D":
+                return 0b1000111
+
+            if mnemonic == "D&M":
+                return 0b1000000
+
+            if mnemonic == "D|M":
+                return 0b1010101
+
+        else:
+            if mnemonic == '0':
+                return 0b0101010
+
+            if mnemonic == '1':
+                return 0b0111111
+
+            if mnemonic == "-1":
+                return 0b0111010
+
+            if mnemonic == "D":
+                return 0b0001100
+
+            if mnemonic == "A":
+                return 0b0110000
+
+            if mnemonic == "!D":
+                return 0b0001101
+
+            if mnemonic == "!A":
+                return 0b0110001
+
+            if mnemonic == "-D":
+                return 0b0001111
+
+            if mnemonic == "-A":
+                return 0b0110011
+
+            if mnemonic == "D+1":
+                return 0b0011111
+
+            if mnemonic == "A+1":
+                return 0b0110111
+
+            if mnemonic == "D-1":
+                return 0b0001110
+
+            if mnemonic == "A-1":
+                return 0b0110010
+
+            if mnemonic == "D+A":
+                return 0b0000010
+
+            if mnemonic == "D-A":
+                return 0b0010011
+
+            if mnemonic == "A-D":
+                return 0b0000111
+
+            if mnemonic == "D&A":
+                return 0b0000000
+
+            if mnemonic == "D|A":
+                return 0b0010101
+
 
     def jump(self, mnemonic):
         """
