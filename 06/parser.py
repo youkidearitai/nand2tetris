@@ -13,9 +13,23 @@ class Parser:
     各アセンブリコマンドをその基本要素（フィールドとシンボル）に分解する
     """
 
+    # 入力ストリーム
     stream = None
 
+    # コマンドの種類
+    command_type = None
+
+    # 現在の行
     nowline = '\n'
+
+    # A_COMMANDの正規表現
+    a_command_rex = None
+
+    # C_COMMANDの正規表現
+    c_command_rex = None
+
+    # L_COMMANDの正規表現
+    l_comand_rex = None
 
     def __init__(self, stream):
         """入力ファイル/ストリームを開きパースを行う準備をする
@@ -27,6 +41,12 @@ class Parser:
         インスタンス
         """
         self.stream = stream
+
+        self.a_command_rex = re.compile('^\\@([a-zA-Z0-9]+)')
+        self.c_command_rex = re.compile(
+            '^(([AMD]{1,3})=)?([-!]?[AMD01])([-+&|])?([01AMD])?(;)?(J[GELNM][TQETP])?$'
+        )
+        self.l_comand_rex = re.compile('^\(([a-zA-Z0-9]+)\)$')
 
     def hasMoreCommands(self):
         """
@@ -56,19 +76,16 @@ class Parser:
         Return value:
         [ACL]_COMMAND
         """
-        symbol = re.search('^\\@[a-zA-Z0-9]+', self.nowline)
-        if symbol is not None:
+        self.command_type = self.a_command_rex.match(self.nowline)
+        if self.command_type is not None:
             return A_COMMAND
 
-        c_command = re.search(
-            '^(([AMD]{1,3})=)?([-!]?[AMD])([-+&|])?([01AMD])?(;J[GELNM][TQETP])?$',
-            self.nowline
-        )
-        if c_command is not None:
+        self.command_type = self.c_command_rex.match(self.nowline)
+        if self.command_type is not None:
             return C_COMMAND
 
-        l_command = re.search('^\([a-zA-Z0-9]+\)$', self.nowline)
-        if l_command is not None:
+        self.command_type = self.l_comand_rex.match(self.nowline)
+        if self.command_type is not None:
             return L_COMMAND
 
         raise NotCommandErrorException(self.nowline)
@@ -78,12 +95,12 @@ class Parser:
         現コマンド@Xxxまたは(Xxx)のXxxを返す。
         Xxxはシンボルまたは10進数の数値である。
         このルーチンはcommandType()がA_COMMANDまたは
-        C_COMMANDの時だけ呼ぶようにする
+        L_COMMANDの時だけ呼ぶようにする
 
         Return value:
         string
         """
-        pass
+        return self.command_type.group(1)
 
     def dest(self):
         """
@@ -92,7 +109,11 @@ class Parser:
         このルーチンはcommandType()がC_COMMANDのときだけ
         呼ぶようにする。
         """
-        pass
+        dest = self.command_type.group(2)
+        if dest is None:
+            return ''
+
+        return dest
 
     def comp(self):
         """
@@ -101,7 +122,20 @@ class Parser:
         このルーチンはcommandType()がC_COMMANDのときだけ
         呼ぶようにする。
         """
-        pass
+
+        left_var = self.command_type.group(3)
+        if left_var is None:
+            left_var = ''
+
+        ctr_var = self.command_type.group(4)
+        if ctr_var is None:
+            ctr_var = ''
+
+        rght_var = self.command_type.group(5)
+        if rght_var is None:
+            rght_var = ''
+
+        return left_var + ctr_var + rght_var
 
     def jump(self):
         """
@@ -110,7 +144,12 @@ class Parser:
         このルーチンはcommandType()がC_COMMANDのときだけ
         呼ぶようにする。
         """
-        pass
+        jump = self.command_type.group(7)
+
+        if jump is None:
+            return ''
+
+        return jump
 
 class NotCommandErrorException(Exception):
     pass
