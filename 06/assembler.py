@@ -12,7 +12,7 @@ f = open(sys.argv[1], 'r')
 p = parser.Parser(f)
 c = code.Code()
 
-isint = re.compile("^[0-9]$")
+isint = re.compile("^[0-9]+$")
 
 output_file_name = sys.argv[1].split(".")[0] + ".hack"
 output_file = open(output_file_name, 'w')
