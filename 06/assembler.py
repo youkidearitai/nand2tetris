@@ -2,11 +2,17 @@
 
 import parser
 import code
+import sys
 
-filename = 'test.asm'
+if len(sys.argv) < 2:
+    print("usage: python assembler.py filename")
 
-p = parser.Parser(open(filename, 'r'))
+f = open(sys.argv[1], 'r')
+p = parser.Parser(f)
 c = code.Code()
+
+output_file_name = sys.argv[1].split(".")[0] + ".hack"
+output_file = open(output_file_name, 'w')
 
 while True:
     binary = 0b0000000000000000
@@ -24,6 +30,9 @@ while True:
         binary = binary + (c.dest(p.dest()) << 3)
         binary = binary + c.jump(p.jump())
 
-    print(bin(binary))
+    output_file.write(format(binary, 'b') + "\n")
+
+output_file.close()
+f.close()
 
 
