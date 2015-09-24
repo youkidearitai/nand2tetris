@@ -49,7 +49,7 @@ class TestCode(unittest.TestCase):
         self.assertEqual(c.comp("M+1"), 0b1110111)
         self.assertEqual(c.comp("M-1"), 0b1110010)
         self.assertEqual(c.comp("D+M"), 0b1000010)
-        self.assertEqual(c.comp("D-M"), 0b1000010)
+        self.assertEqual(c.comp("D-M"), 0b1010011)
         self.assertEqual(c.comp("M-D"), 0b1000111)
         self.assertEqual(c.comp("D&M"), 0b1000000)
         self.assertEqual(c.comp("D|M"), 0b1010101)

@@ -57,7 +57,7 @@ class Code:
                 return 0b1000010
 
             if mnemonic == "D-M":
-                return 0b1000010
+                return 0b1010011
 
             if mnemonic == "M-D":
                 return 0b1000111
