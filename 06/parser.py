@@ -45,11 +45,11 @@ class Parser:
         """
         self.stream = stream
 
-        self.a_command_rex = re.compile('^\\@([a-zA-Z0-9]+)')
+        self.a_command_rex = re.compile('^\\@([_.$:a-zA-Z0-9]+)')
         self.c_command_rex = re.compile(
             '^(([AMD]{1,3})=)?([-!]?[AMD01])([-+&|])?([01AMD])?(;)?(J[GELNM][TQETP])?$'
         )
-        self.l_comand_rex = re.compile('^\(([a-zA-Z0-9]+)\)$')
+        self.l_comand_rex = re.compile('^\(([_.$:a-zA-Z0-9]+)\)$')
         self.delete_rex = re.compile('(?://.*| )')
 
     def hasMoreCommands(self):
