@@ -29,15 +29,6 @@ class Parser:
     # 現在の行
     nowline = '\n'
 
-    # A_COMMANDの正規表現
-    a_command_rex = None
-
-    # C_COMMANDの正規表現
-    c_command_rex = None
-
-    # L_COMMANDの正規表現
-    l_comand_rex = None
-
     # 無視する文字列の正規表現
     delete_rex = None
 
@@ -51,13 +42,7 @@ class Parser:
         インスタンス
         """
         self.stream = stream
-
-        self.a_command_rex = re.compile('^\\@([_.$:a-zA-Z0-9]+)')
-        self.c_command_rex = re.compile(
-            '^(([AMD]{1,3})=)?([-!]?[AMD01])([-+&|])?([01AMD])?(;)?(J[GELNM][TQETP])?$'
-        )
-        self.l_comand_rex = re.compile('^\(([_.$:a-zA-Z0-9]+)\)$')
-        self.delete_rex = re.compile('(?://.*| )')
+        self.delete_rex = re.compile('(?://.*)')
 
     def hasMoreCommands(self):
         """
@@ -74,37 +59,35 @@ class Parser:
         このルーチンはhasMoreCommands()がtrueの場合のみ
         呼ぶようにする。最初は現コマンドは空である。
         """
-        self.nowline = self.delete_rex.sub("", self.stream.readline())
-        return self.nowline
+        self.nowline = self.delete_rex.sub("", self.stream.readline().strip())
+        self.commands = self.nowline.split(" ")
 
     def commandType(self):
         """
         現コマンドの種類を返す
-        - A_COMMANDは@Xxxを意味し、Xxxはシンボルか10進数の数値である。
-        - C_COMMANDはdest=comp;jumpを意味する。
-        - L_COMMANDは擬似コマンドであり、(Xxx)をいみする。Xxxはシンボルである。
-
         Return value:
-        [ACL]_COMMAND
+        C_(ARITHMETIC|PUSH|POP)
         """
-        self.command_type = self.a_command_rex.match(self.nowline)
-        if self.command_type is not None:
-            return A_COMMAND
 
-        self.command_type = self.c_command_rex.match(self.nowline)
-        if self.command_type is not None:
-            return C_COMMAND
+        if self.commands[0] == "push":
+            self.command_type = C_PUSH
+        elif self.commands[0] == "pop":
+            self.command_type = C_POP
+        elif self.commands[0] == "add":
+            self.command_type = C_ARITHMETIC
+        else:
+            raise NotCommandErrorException("no command", self.commands[0])
 
-        self.command_type = self.l_comand_rex.match(self.nowline)
-        if self.command_type is not None:
-            return L_COMMAND
+        return self.command_type
 
     def arg1(self):
         """
         現コマンドの最初の引数が返される。
         """
+        if self.command_type == C_ARITHMETIC:
+            return self.commands[0]
 
-        return ""
+        return self.commands[1]
 
     def arg2(self):
         """
@@ -113,7 +96,7 @@ class Parser:
         場合のみ本ルーチンを呼ぶようにする
         """
 
-        return ""
+        return self.commands[2]
 
 class NotCommandErrorException(Exception):
     pass
