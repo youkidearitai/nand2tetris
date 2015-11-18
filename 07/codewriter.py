@@ -33,6 +33,11 @@ class CodeWriter:
         出力ファイル・ストリームを開き書き込む準備を行う
         """
         self.stream = stream
+        segment = "constant"
+        self.stream.write("@{0} // {0}(RAM[{0}])をDレジスタに一時退避\n".format(self.segment[segment]))
+        self.stream.write("D=A\n")
+        self.stream.write("@SP // スタックポインタを{0}に設定する\n".format(self.segment[segment]))
+        self.stream.write("M=D // RAM[0]に{0}を入れる\n".format(self.segment[segment]))
 
     def setFileName(self, fileName):
         """
@@ -119,10 +124,6 @@ class CodeWriter:
         if c_command == "push":
             if segment == "constant":
                 self.stream.write("// push constant {0} コマンド\n".format(index))
-                self.stream.write("@{0} // {0}(RAM[{0}])をDレジスタに一時退避\n".format(self.segment[segment]))
-                self.stream.write("D=A\n")
-                self.stream.write("@SP // スタックポインタを{0}に設定する\n".format(self.segment[segment]))
-                self.stream.write("M=D // RAM[0]に{0}を入れる\n".format(self.segment[segment]))
                 self.stream.write("@{0} // {0}をpushする\n".format(index))
                 self.stream.write("D=A\n")
                 self.stream.write("@SP\n")
