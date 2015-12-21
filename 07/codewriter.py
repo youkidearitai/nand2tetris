@@ -41,7 +41,7 @@ class CodeWriter:
         segment = "local"
         self.stream.write("@{0} // {0}(RAM[{0}])をDレジスタに一時退避\n".format(self.segment[segment]))
         self.stream.write("D=A\n")
-        self.stream.write("@SP // スタックポインタを{0}に設定する\n".format(self.segment[segment]))
+        self.stream.write("@LCL // スタックポインタを{0}に設定する\n".format(self.segment[segment]))
         self.stream.write("M=D // RAM[0]に{0}を入れる\n".format(self.segment[segment]))
 
     def setFileName(self, fileName):
@@ -120,6 +120,38 @@ class CodeWriter:
         if command == "not":
             return "!"
 
+    def writePushCommand(self, segment, index):
+        """
+        アセンブリ言語に書き換えるためのメソッド
+        共通ならばここに書いてしまおう
+        """
+        if segment == "constant":
+            ptr = "SP"
+        elif segment == "local":
+            ptr = "LCL"
+        elif segment == "argument":
+            ptr = "ARG"
+        elif segment == "this":
+            ptr = "THIS"
+        elif segment == "that":
+            ptr = "THAT"
+        else:
+            raise BaseException("notfound segment: {0}".format(segment))
+
+        self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
+        self.stream.write("@{0} // {0}をpushする\n".format(index))
+        self.stream.write("D=A\n")
+        self.stream.write("@{0}\n".format(ptr))
+        self.stream.write("A=M // アドレスを{0}に設定する\n".format(self.segment[segment]))
+        self.stream.write("M=D // RAM[{0}]に{1} {2}が入る\n".format(self.segment[segment], segment, index))
+        self.stream.write("D=A+1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
+        self.stream.write(
+            "@{0} // pushの作業が終わったのでSPレジスタに1追加したDレジスタから代入して終了\n".format(
+                ptr
+            )
+        )
+        self.stream.write("M=D\n")
+
     def writePushpop(self, c_command, segment, index):
         """
         C_PUSHまたはC_POPコマンドをアセンブリコードに変換し、
@@ -128,16 +160,7 @@ class CodeWriter:
         # TODO:現在のところは push constant nのみ
         if c_command == "push":
             if segment == "constant":
-                self.stream.write("// push constant {0} コマンド\n".format(index))
-                self.stream.write("@{0} // {0}をpushする\n".format(index))
-                self.stream.write("D=A\n")
-                self.stream.write("@SP\n")
-                self.stream.write("A=M // アドレスを{0}に設定する\n".format(self.segment[segment]))
-                self.stream.write("M=D // RAM[{0}]にconstant {1}が入る\n".format(self.segment[segment], index))
-                self.stream.write("D=A+1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
-                self.stream.write("@SP // pushの作業が終わったのでSPレジスタに1追加したDレジスタから代入して終了\n")
-                self.stream.write("M=D\n")
-                self.segment[segment] = self.segment[segment] + 1
+                self.writePushCommand(segment, index)
             elif segment == "local" or \
                     segment == "argument" or \
                     segment == "this" or \
