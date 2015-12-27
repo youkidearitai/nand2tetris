@@ -19,7 +19,10 @@ while True:
     if p.hasMoreCommands() != True:
         break
 
-    command_type = p.commandType()
+    try:
+        command_type = p.commandType()
+    except parser.NotCommandErrorException:
+        continue
 
     if command_type == parser.C_ARITHMETIC:
         c.writeArithmetic(p.arg1())

@@ -59,8 +59,9 @@ class Parser:
         このルーチンはhasMoreCommands()がtrueの場合のみ
         呼ぶようにする。最初は現コマンドは空である。
         """
-        self.nowline = self.delete_rex.sub("", self.stream.readline().strip())
-        self.commands = self.nowline.split(" ")
+        self.nowline = self.stream.readline().strip()
+        nowline = self.delete_rex.sub("", self.nowline)
+        self.commands = nowline.split(" ")
 
     def commandType(self):
         """
