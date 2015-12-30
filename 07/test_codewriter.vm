@@ -1,5 +1,3 @@
 push constant 6
 push constant 7
 add
-push local 3
-

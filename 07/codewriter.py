@@ -67,9 +67,6 @@ class CodeWriter:
             self.stream.write("D=M // DレジスタにRAM[SP]の中身を退避させる\n")
             self.stream.write("A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる\n")
             self.stream.write("M=M+D // RAM[SP] + RAM[SP-1]\n")
-            self.stream.write("D=A+1 // DレジスタにSPを入れて退避させる\n")
-            self.stream.write("@SP\n")
-            self.stream.write("M=D // Dレジスタに退避させていたSPを入れて次のpush popに備える\n")
 
         if command == "sub":
             self.stream.write("@SP // popするのでアドレスを1減らす\n")
@@ -81,7 +78,7 @@ class CodeWriter:
             self.stream.write("M=M-D // RAM[SP] - RAM[SP-1]\n")
             self.stream.write("D=A+1 // DレジスタにSPを入れて退避させる\n")
             self.stream.write("@SP\n")
-            self.stream.write("M=D // Dレジスタに退避させていたSPを入れて次のpush popに備える\n")
+            self.stream.write("M=M-1 // Dレジスタに退避させていたSPを入れて次のpush popに備える\n")
 
         if command == "neg":
             self.stream.write("@SP // popするのでアドレスを1減らす\n")
@@ -91,7 +88,7 @@ class CodeWriter:
             self.stream.write("M=-M // -RAM[SP]\n")
             self.stream.write("D=A+1 // DレジスタにSPを入れて退避させる\n")
             self.stream.write("@SP\n")
-            self.stream.write("M=D // Dレジスタに退避させていたSPを入れて次のpush popに備える\n")
+            self.stream.write("M=M-1 // Dレジスタに退避させていたSPを入れて次のpush popに備える\n")
 
         if command == "eq":
             self.stream.write("@SP // popするのでアドレスを1減らす\n")
@@ -103,7 +100,7 @@ class CodeWriter:
             self.stream.write("M=M-D // RAM[SP] - RAM[SP-1]\n")
             self.stream.write("D=A+1 // DレジスタにSPを入れて退避させる\n")
             self.stream.write("@SP\n")
-            self.stream.write("M=D // Dレジスタに退避させていたSPを入れて次のpush popに備える\n")
+            self.stream.write("M=M-1 // Dレジスタに退避させていたSPを入れて次のpush popに備える\n")
 
         if command == "gt":
             return ">"
@@ -125,9 +122,7 @@ class CodeWriter:
         アセンブリ言語に書き換えるためのメソッド
         共通ならばここに書いてしまおう
         """
-        if segment == "constant":
-            ptr = "SP"
-        elif segment == "local":
+        if segment == "local":
             ptr = "LCL"
         elif segment == "argument":
             ptr = "ARG"
@@ -135,8 +130,8 @@ class CodeWriter:
             ptr = "THIS"
         elif segment == "that":
             ptr = "THAT"
-        else:
-            raise BaseException("notfound segment: {0}".format(segment))
+        else: # constant
+            ptr = "SP"
 
         self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
         self.stream.write("@{0} // {0}をpushする\n".format(index))
@@ -144,13 +139,34 @@ class CodeWriter:
         self.stream.write("@{0}\n".format(ptr))
         self.stream.write("A=M // アドレスを{0}に設定する\n".format(self.segment[segment]))
         self.stream.write("M=D // RAM[{0}]に{1} {2}が入る\n".format(self.segment[segment], segment, index))
-        self.stream.write("D=A+1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
-        self.stream.write(
-            "@{0} // pushの作業が終わったのでSPレジスタに1追加したDレジスタから代入して終了\n".format(
-                ptr
-            )
-        )
+        self.stream.write("@SP\n")
+        self.stream.write("M=M+1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
+
+    def writePopCommand(self, segment, index):
+        if segment == "local":
+            ptr = "LCL"
+        elif segment == "argument":
+            ptr = "ARG"
+        elif segment == "this":
+            ptr = "THIS"
+        elif segment == "that":
+            ptr = "THAT"
+        else: # constant
+            ptr = "SP"
+
+        self.stream.write("// pop {0} {1} コマンド\n".format(segment, index))
+        self.stream.write("@{0} // {0}をAレジスタにセットする\n".format(index))
+        self.stream.write("D=A\n")
+        self.stream.write("@{0}\n".format(ptr))
+        self.stream.write("D=D+M // Dレジスタに{0} + {1}が入る\n".format(ptr, index))
+        self.stream.write("@SP\n")
+        self.stream.write("A=M\n")
         self.stream.write("M=D\n")
+        self.stream.write("@{0}\n".format(index))
+        self.stream.write("D=A\n")
+        self.stream.write("@SP\n")
+        self.stream.write("M=M-1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
+
 
     def writePushpop(self, c_command, segment, index):
         """
@@ -165,30 +181,13 @@ class CodeWriter:
                     segment == "argument" or \
                     segment == "this" or \
                     segment == "that":
-                self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
-                self.stream.write("@{0} // {0}をpushする\n".format(index))
-                self.stream.write("D=A\n")
-                self.stream.write("@SP\n")
-                self.stream.write("A=M // アドレスを{0}に設定する\n".format(self.segment[segment]))
-                self.stream.write("M=D // RAM[{0}]に{1} {2}が入る\n".format(self.segment[segment], segment, index))
-                self.stream.write("D=A+1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
-                self.stream.write("@SP // pushの作業が終わったのでSPレジスタに1追加したDレジスタから代入して終了\n")
-                self.stream.write("M=D\n")
+                self.writePushCommand(segment, index)
         elif c_command == "pop":
             if segment == "local" or \
                     segment == "argument" or \
                     segment == "this" or \
                     segment == "that":
-                self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
-                self.stream.write("@{0} // {0}をpushする\n".format(index))
-                self.stream.write("D=A\n")
-                self.stream.write("@SP\n")
-                self.stream.write("A=M // アドレスを{0}に設定する\n".format(self.segment[segment]))
-                self.stream.write("M=D // RAM[{0}]に{1} {2}が入る\n".format(self.segment[segment], segment, index))
-                self.stream.write("D=A-1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
-                self.stream.write("@SP // pushの作業が終わったのでSPレジスタに1追加したDレジスタから代入して終了\n")
-                self.stream.write("M=D\n")
-
+                self.writePopCommand(segment, index)
 
     def close(self):
         """
