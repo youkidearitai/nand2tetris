@@ -64,6 +64,7 @@ class CodeWriter:
             self.stream.write("M=M+D // RAM[SP] + RAM[SP-1]\n")
 
         if command == "sub":
+            self.stream.write("// subコマンド\n")
             self.stream.write("@SP // popするのでアドレスを1減らす\n")
             self.stream.write("M=M-1\n")
             self.stream.write("D=M\n")
@@ -71,9 +72,6 @@ class CodeWriter:
             self.stream.write("D=M // DレジスタにRAM[SP]の中身を退避させる\n")
             self.stream.write("A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる\n")
             self.stream.write("M=M-D // RAM[SP] - RAM[SP-1]\n")
-            self.stream.write("D=A+1 // DレジスタにSPを入れて退避させる\n")
-            self.stream.write("@SP\n")
-            self.stream.write("M=M-1 // Dレジスタに退避させていたSPを入れて次のpush popに備える\n")
 
         if command == "neg":
             self.stream.write("@SP // popするのでアドレスを1減らす\n")
