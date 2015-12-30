@@ -38,11 +38,6 @@ class CodeWriter:
         self.stream.write("D=A\n")
         self.stream.write("@SP // スタックポインタを{0}に設定する\n".format(self.segment[segment]))
         self.stream.write("M=D // RAM[0]に{0}を入れる\n".format(self.segment[segment]))
-        segment = "local"
-        self.stream.write("@{0} // {0}(RAM[{0}])をDレジスタに一時退避\n".format(self.segment[segment]))
-        self.stream.write("D=A\n")
-        self.stream.write("@LCL // スタックポインタを{0}に設定する\n".format(self.segment[segment]))
-        self.stream.write("M=D // RAM[0]に{0}を入れる\n".format(self.segment[segment]))
 
     def setFileName(self, fileName):
         """
@@ -155,15 +150,14 @@ class CodeWriter:
             ptr = "SP"
 
         self.stream.write("// pop {0} {1} コマンド\n".format(segment, index))
-        self.stream.write("@{0} // {0}をAレジスタにセットする\n".format(index))
-        self.stream.write("D=A\n")
-        self.stream.write("@{0}\n".format(ptr))
-        self.stream.write("D=D+M // Dレジスタに{0} + {1}が入る\n".format(ptr, index))
-        self.stream.write("@SP\n")
-        self.stream.write("A=M\n")
-        self.stream.write("M=D\n")
+        self.stream.write("@SP // {0} スタックポインタをセットする\n".format(index))
+        self.stream.write("D=M\n")
+        self.stream.write("A=D\n")
+        self.stream.write("D=M\n")
         self.stream.write("@{0}\n".format(index))
-        self.stream.write("D=A\n")
+        self.stream.write("A=M+D // Aレジスタに{0} + {1}が入る\n".format(ptr, index))
+        self.stream.write("A=A-D // Aレジスタに{0}が入る\n".format(index))
+        self.stream.write("M=D // Mに入るのは {0} + {1}\n".format(ptr, index))
         self.stream.write("@SP\n")
         self.stream.write("M=M-1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
 

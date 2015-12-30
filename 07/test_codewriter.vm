@@ -1,3 +1,5 @@
 push constant 6
 push constant 7
 add
+pop local 1
+pop argument 3
