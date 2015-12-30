@@ -82,6 +82,8 @@ class Parser:
             self.command_type = C_ARITHMETIC
         elif self.commands[0] == "eq":
             self.command_type = C_ARITHMETIC
+        elif self.commands[0] == "and":
+            self.command_type = C_ARITHMETIC
         else:
             raise NotCommandErrorException("no command", self.commands[0])
 

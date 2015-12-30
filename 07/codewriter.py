@@ -100,13 +100,33 @@ class CodeWriter:
             return "<"
 
         if command == "and":
-            return "&"
+            self.stream.write("// andコマンド\n")
+            self.stream.write("@SP // popするのでアドレスを1減らす\n")
+            self.stream.write("M=M-1\n")
+            self.stream.write("D=M\n")
+            self.stream.write("A=D // アドレスをRAM[SP]に変更する\n")
+            self.stream.write("D=M // DレジスタにRAM[SP]の中身を退避させる\n")
+            self.stream.write("A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる\n")
+            self.stream.write("M=M&D // RAM[SP] & RAM[SP-1]\n")
 
         if command == "or":
-            return "|"
+            self.stream.write("// orコマンド\n")
+            self.stream.write("@SP // popするのでアドレスを1減らす\n")
+            self.stream.write("M=M-1\n")
+            self.stream.write("D=M\n")
+            self.stream.write("A=D // アドレスをRAM[SP]に変更する\n")
+            self.stream.write("D=M // DレジスタにRAM[SP]の中身を退避させる\n")
+            self.stream.write("A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる\n")
+            self.stream.write("M=M|D // RAM[SP] | RAM[SP-1]\n")
 
         if command == "not":
-            return "!"
+            self.stream.write("// notコマンド\n")
+            self.stream.write("@SP // popするのでアドレスを1減らす\n")
+            self.stream.write("D=M\n")
+            self.stream.write("A=D // アドレスをRAM[SP]に変更する\n")
+            self.stream.write("D=M // DレジスタにRAM[SP]の中身を退避させる\n")
+            self.stream.write("A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる\n")
+            self.stream.write("M=!M // RAM[SP] ! RAM[SP-1]\n")
 
     def writePushCommand(self, segment, index):
         """
