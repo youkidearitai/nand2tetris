@@ -1,3 +1,2 @@
 push constant 10
-push constant 4
-or
+not
