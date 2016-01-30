@@ -28,11 +28,15 @@ class CodeWriter:
         "static": 16     # アセンブリ内で新しいシンボルに出くわした場合の新しいRAMアドレス
     }
 
+    # ジャンプアドレス
+    jmpAddr = 0
+
     def __init__(self, stream):
         """
         出力ファイル・ストリームを開き書き込む準備を行う
         """
         self.stream = stream
+        self.jmpAddr = 0
         segment = "constant"
         self.stream.write("@{0} // {0}(RAM[{0}])をDレジスタに一時退避\n".format(self.segment[segment]))
         self.stream.write("D=A\n")
@@ -90,8 +94,22 @@ class CodeWriter:
             self.stream.write("A=D // アドレスをRAM[SP]に変更する\n")
             self.stream.write("D=M // DレジスタにRAM[SP]の中身を退避させる\n")
             self.stream.write("A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる\n")
-            self.stream.write("M=M-D // RAM[SP] - RAM[SP-1]\n")
-            self.stream.write("M=!M // RAM[SP] - RAM[SP-1]\n")
+            self.stream.write("D=M-D // RAM[SP] - RAM[SP-1]\n")
+            self.stream.write("@GTHAN_EQ{0} // RAM[SP] - RAM[SP-1]\n".format(self.jmpAddr))
+            self.stream.write("D;JEQ // RAM[SP] - RAM[SP-1]\n")
+            self.stream.write("@SP\n")
+            self.stream.write("D=M\n")
+            self.stream.write("A=D-1\n")
+            self.stream.write("M=0\n")
+            self.stream.write("@GTHAN_EQ_END{0}\n".format(self.jmpAddr))
+            self.stream.write("0;JMP\n")
+            self.stream.write("(GTHAN_EQ{0})\n".format(self.jmpAddr))
+            self.stream.write("  @SP\n")
+            self.stream.write("  D=M\n")
+            self.stream.write("  A=D-1\n")
+            self.stream.write("  M=-1\n")
+            self.stream.write("(GTHAN_EQ_END{0})\n".format(self.jmpAddr))
+            self.jmpAddr = self.jmpAddr + 1
 
         if command == "gt":
             return ">"
