@@ -112,10 +112,54 @@ class CodeWriter:
             self.jmpAddr = self.jmpAddr + 1
 
         if command == "gt":
-            return ">"
+            self.stream.write("// gtコマンド\n")
+            self.stream.write("@SP // popするのでアドレスを1減らす\n")
+            self.stream.write("M=M-1\n")
+            self.stream.write("D=M\n")
+            self.stream.write("A=D // アドレスをRAM[SP]に変更する\n")
+            self.stream.write("D=M // DレジスタにRAM[SP]の中身を退避させる\n")
+            self.stream.write("A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる\n")
+            self.stream.write("D=M-D // RAM[SP] - RAM[SP-1]\n")
+            self.stream.write("@GTHAN_EQ{0} // RAM[SP] - RAM[SP-1]\n".format(self.jmpAddr))
+            self.stream.write("D;JGT // RAM[SP] - RAM[SP-1]\n")
+            self.stream.write("@SP\n")
+            self.stream.write("D=M\n")
+            self.stream.write("A=D-1\n")
+            self.stream.write("M=0\n")
+            self.stream.write("@GTHAN_EQ_END{0}\n".format(self.jmpAddr))
+            self.stream.write("0;JMP\n")
+            self.stream.write("(GTHAN_EQ{0})\n".format(self.jmpAddr))
+            self.stream.write("  @SP\n")
+            self.stream.write("  D=M\n")
+            self.stream.write("  A=D-1\n")
+            self.stream.write("  M=-1\n")
+            self.stream.write("(GTHAN_EQ_END{0})\n".format(self.jmpAddr))
+            self.jmpAddr = self.jmpAddr + 1
 
         if command == "lt":
-            return "<"
+            self.stream.write("// ltコマンド\n")
+            self.stream.write("@SP // popするのでアドレスを1減らす\n")
+            self.stream.write("M=M-1\n")
+            self.stream.write("D=M\n")
+            self.stream.write("A=D // アドレスをRAM[SP]に変更する\n")
+            self.stream.write("D=M // DレジスタにRAM[SP]の中身を退避させる\n")
+            self.stream.write("A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる\n")
+            self.stream.write("D=M-D // RAM[SP] - RAM[SP-1]\n")
+            self.stream.write("@GTHAN_EQ{0} // RAM[SP] - RAM[SP-1]\n".format(self.jmpAddr))
+            self.stream.write("D;JLT // RAM[SP] - RAM[SP-1]\n")
+            self.stream.write("@SP\n")
+            self.stream.write("D=M\n")
+            self.stream.write("A=D-1\n")
+            self.stream.write("M=0\n")
+            self.stream.write("@GTHAN_EQ_END{0}\n".format(self.jmpAddr))
+            self.stream.write("0;JMP\n")
+            self.stream.write("(GTHAN_EQ{0})\n".format(self.jmpAddr))
+            self.stream.write("  @SP\n")
+            self.stream.write("  D=M\n")
+            self.stream.write("  A=D-1\n")
+            self.stream.write("  M=-1\n")
+            self.stream.write("(GTHAN_EQ_END{0})\n".format(self.jmpAddr))
+            self.jmpAddr = self.jmpAddr + 1
 
         if command == "and":
             self.stream.write("// andコマンド\n")

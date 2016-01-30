@@ -18,7 +18,7 @@ A=M // アドレスを256に設定する
 M=D // RAM[256]にconstant 9が入る
 @SP
 M=M+1 // SPレジスタ(RAM[256])に1を追加してDレジスタに退避
-// eqコマンド
+// ltコマンド
 @SP // popするのでアドレスを1減らす
 M=M-1
 D=M
@@ -27,7 +27,7 @@ D=M // DレジスタにRAM[SP]の中身を退避させる
 A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる
 D=M-D // RAM[SP] - RAM[SP-1]
 @GTHAN_EQ0 // RAM[SP] - RAM[SP-1]
-D;JEQ // RAM[SP] - RAM[SP-1]
+D;JLT // RAM[SP] - RAM[SP-1]
 @SP
 D=M
 A=D-1

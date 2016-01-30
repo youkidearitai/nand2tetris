@@ -82,6 +82,10 @@ class Parser:
             self.command_type = C_ARITHMETIC
         elif self.commands[0] == "eq":
             self.command_type = C_ARITHMETIC
+        elif self.commands[0] == "gt":
+            self.command_type = C_ARITHMETIC
+        elif self.commands[0] == "lt":
+            self.command_type = C_ARITHMETIC
         elif self.commands[0] == "and":
             self.command_type = C_ARITHMETIC
         elif self.commands[0] == "or":
