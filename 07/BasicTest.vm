@@ -1,4 +1,4 @@
-push constant 3032
-pop pointer 0
-push constant 3046
-pop pointer 1
+push constant 35
+pop temp 1
+push constant 70
+pop temp 0
