@@ -242,6 +242,12 @@ class CodeWriter:
             self.stream.write("D=A\n")
             self.stream.write("@{0}\n".format(ptr))
             self.stream.write("M=M-D\n")
+        elif segment == "pointer":
+            self.stream.write("// pop {0} {1} コマンド\n".format(segment, index))
+            self.stream.write("@SP\n")
+            self.stream.write("M=M-1\n")
+            self.stream.write("@{0}\n".format(self.segment["pointer"] + int(index)))
+            self.stream.write("M=D\n")
         else: # constant
             ptr = "SP"
             self.stream.write("// pop {0} {1} コマンド\n".format(segment, index))
@@ -276,6 +282,8 @@ class CodeWriter:
                     segment == "argument" or \
                     segment == "this" or \
                     segment == "that":
+                self.writePopCommand(segment, index)
+            elif segment == "pointer":
                 self.writePopCommand(segment, index)
 
     def close(self):
