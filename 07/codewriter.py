@@ -226,6 +226,13 @@ class CodeWriter:
             self.stream.write("M=D\n")
             self.stream.write("@SP\n")
             self.stream.write("M=M+1\n")
+        elif segment == "pointer" or segment == "temp":
+            self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
+            self.stream.write("@{0}\n".format(int(index) + self.segment[segment]))
+            self.stream.write("D=M\n")
+            self.stream.write("@SP\n")
+            self.stream.write("A=M\n")
+            self.stream.write("M=D\n")
         else: # constant
             ptr = "SP"
             self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
@@ -291,6 +298,8 @@ class CodeWriter:
                     segment == "argument" or \
                     segment == "this" or \
                     segment == "that":
+                self.writePushCommand(segment, index)
+            elif segment == "pointer" or segment == "temp":
                 self.writePushCommand(segment, index)
         elif c_command == "pop":
             if segment == "local" or \
