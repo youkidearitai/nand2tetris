@@ -210,17 +210,32 @@ class CodeWriter:
             ptr = "THIS"
         elif segment == "that":
             ptr = "THAT"
+
+        if segment == "local" or segment == "argument" or segment == "this" or segment == "that":
+            self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
+            self.stream.write("@{0}\n".format(index))
+            self.stream.write("D=A\n")
+            self.stream.write("@{0}\n".format(ptr))
+            self.stream.write("M=M+D\n")
+            self.stream.write("@SP\n")
+            self.stream.write("D=M\n")
+            self.stream.write("A=D\n")
+            self.stream.write("D=M\n")
+            self.stream.write("@LCL\n")
+            self.stream.write("A=M\n")
+            self.stream.write("M=D\n")
+            self.stream.write("@SP\n")
+            self.stream.write("M=M+1\n")
         else: # constant
             ptr = "SP"
-
-        self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
-        self.stream.write("@{0} // {0}をpushする\n".format(index))
-        self.stream.write("D=A\n")
-        self.stream.write("@{0}\n".format(ptr))
-        self.stream.write("A=M // アドレスを{0}に設定する\n".format(self.segment[segment]))
-        self.stream.write("M=D // RAM[{0}]に{1} {2}が入る\n".format(self.segment[segment], segment, index))
-        self.stream.write("@SP\n")
-        self.stream.write("M=M+1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
+            self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
+            self.stream.write("@{0} // {0}をpushする\n".format(index))
+            self.stream.write("D=A\n")
+            self.stream.write("@{0}\n".format(ptr))
+            self.stream.write("A=M // アドレスを{0}に設定する\n".format(self.segment[segment]))
+            self.stream.write("M=D // RAM[{0}]に{1} {2}が入る\n".format(self.segment[segment], segment, index))
+            self.stream.write("@SP\n")
+            self.stream.write("M=M+1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
 
     def writePopCommand(self, segment, index):
         if segment in self.segmentPtr.keys():

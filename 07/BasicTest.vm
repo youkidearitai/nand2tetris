@@ -2,3 +2,5 @@ push constant 35
 pop temp 1
 push constant 70
 pop temp 0
+push temp 1
+push temp 2
