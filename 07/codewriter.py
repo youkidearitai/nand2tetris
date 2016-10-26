@@ -221,7 +221,7 @@ class CodeWriter:
             self.stream.write("D=M\n")
             self.stream.write("A=D\n")
             self.stream.write("D=M\n")
-            self.stream.write("@LCL\n")
+            self.stream.write("@{0}\n".format(ptr))
             self.stream.write("A=M\n")
             self.stream.write("M=D\n")
             self.stream.write("@SP\n")
@@ -233,6 +233,8 @@ class CodeWriter:
             self.stream.write("@SP\n")
             self.stream.write("A=M\n")
             self.stream.write("M=D\n")
+            self.stream.write("@SP\n")
+            self.stream.write("M=M+1\n")
         else: # constant
             ptr = "SP"
             self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
@@ -245,13 +247,19 @@ class CodeWriter:
             self.stream.write("M=M+1 // SPレジスタ(RAM[{0}])に1を追加してDレジスタに退避\n".format(self.segment[segment]))
 
     def writePopCommand(self, segment, index):
-        if segment in self.segmentPtr.keys():
+        if segment == "pointer" or segment == "temp": # pointer or tempセグメント
+            self.stream.write("// pop {0} {1} コマンド\n".format(segment, index))
+            self.stream.write("@SP\n")
+            self.stream.write("M=M-1\n")
+            self.stream.write("@{0}\n".format(self.segment[segment] + int(index)))
+            self.stream.write("M=D\n")
+        elif segment in self.segmentPtr.keys():
             ptr = self.segmentPtr[segment]
             self.stream.write("// pop {0} {1} コマンド\n".format(segment, index))
             self.stream.write("@{0}\n".format(index))
             self.stream.write("D=A\n")
             self.stream.write("@{0}\n".format(ptr))
-            self.stream.write("M=D+M\n")
+            self.stream.write("D=M+D\n")
             self.stream.write("@{0}\n".format(index))
             self.stream.write("@SP // {0} スタックポインタをセットする\n".format(index))
             self.stream.write("M=M-1\n")
@@ -264,12 +272,6 @@ class CodeWriter:
             self.stream.write("D=A\n")
             self.stream.write("@{0}\n".format(ptr))
             self.stream.write("M=M-D\n")
-        elif segment == "pointer" or segment == "temp": # pointer or tempセグメント
-            self.stream.write("// pop {0} {1} コマンド\n".format(segment, index))
-            self.stream.write("@SP\n")
-            self.stream.write("M=M-1\n")
-            self.stream.write("@{0}\n".format(self.segment[segment] + int(index)))
-            self.stream.write("M=D\n")
         else: # constant
             ptr = "SP"
             self.stream.write("// pop {0} {1} コマンド\n".format(segment, index))
