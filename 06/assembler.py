@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.4
 
-import parser
+import asm_parser
 import code
 import sys
 import re
@@ -10,7 +10,7 @@ if len(sys.argv) < 2:
     print("usage: python assembler.py filename")
 
 f = open(sys.argv[1], 'r')
-p = parser.Parser(f)
+p = asm_parser.Parser(f)
 c = code.Code()
 
 isint = re.compile("^[0-9]+$")
@@ -29,14 +29,14 @@ while True:
     if command_type is None:
         continue
 
-    if command_type == parser.L_COMMAND:
+    if command_type == asm_parser.L_COMMAND:
         s.addEntity(p.symbol(), address)
 
-    if command_type == parser.A_COMMAND or command_type == parser.C_COMMAND:
+    if command_type == asm_parser.A_COMMAND or command_type == asm_parser.C_COMMAND:
         address = address + 1
 
 f.seek(0)
-p = parser.Parser(f)
+p = asm_parser.Parser(f)
 
 output_file_name = sys.argv[1].split(".")[0] + ".hack"
 output_file = open(output_file_name, 'w')
@@ -55,16 +55,16 @@ while True:
     if command_type is None:
         continue
 
-    if command_type == parser.L_COMMAND:
+    if command_type == asm_parser.L_COMMAND:
         continue
 
-    if command_type == parser.C_COMMAND:
+    if command_type == asm_parser.C_COMMAND:
         binary = binary + (0b111 << 13)
         binary = binary + (c.comp(p.comp()) << 6)
         binary = binary + (c.dest(p.dest()) << 3)
         binary = binary + c.jump(p.jump())
 
-    if command_type == parser.A_COMMAND:
+    if command_type == asm_parser.A_COMMAND:
         symbol = p.symbol()
         if isint.search(symbol):
             binary = binary + int(symbol)

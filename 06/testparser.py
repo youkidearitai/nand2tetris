@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import parser
+import asm_parser
 
 class TestParser(unittest.TestCase):
     """
@@ -10,31 +10,31 @@ class TestParser(unittest.TestCase):
     """
 
     def setUp(self):
-        self.parser = parser.Parser(open('test.asm', 'r'))
+        self.parser = asm_parser.Parser(open('test.asm', 'r'))
 
     def test_hasMoreCommands(self):
-        self.parser = parser.Parser(open('test.asm', 'r'))
+        self.parser = asm_parser.Parser(open('test.asm', 'r'))
         a = self.parser.hasMoreCommands()
         self.assertTrue(a)
 
     def test_advance(self):
-        self.parser = parser.Parser(open('test.asm', 'r'))
+        self.parser = asm_parser.Parser(open('test.asm', 'r'))
         self.parser.advance()
-        self.assertEqual(self.parser.commandType(), parser.C_COMMAND)
+        self.assertEqual(self.parser.commandType(), asm_parser.C_COMMAND)
 
     def test_commandType(self):
-        self.parser = parser.Parser(open('test.asm', 'r'))
+        self.parser = asm_parser.Parser(open('test.asm', 'r'))
         self.parser.advance()
-        self.assertEqual(self.parser.commandType(), parser.C_COMMAND)
+        self.assertEqual(self.parser.commandType(), asm_parser.C_COMMAND)
         self.parser.advance()
-        self.assertEqual(self.parser.commandType(), parser.C_COMMAND)
+        self.assertEqual(self.parser.commandType(), asm_parser.C_COMMAND)
         self.parser.advance()
-        self.assertEqual(self.parser.commandType(), parser.A_COMMAND)
+        self.assertEqual(self.parser.commandType(), asm_parser.A_COMMAND)
         self.parser.advance()
-        self.assertEqual(self.parser.commandType(), parser.L_COMMAND)
+        self.assertEqual(self.parser.commandType(), asm_parser.L_COMMAND)
 
     def test_mnmonic(self):
-        self.parser = parser.Parser(open('test.asm', 'r'))
+        self.parser = asm_parser.Parser(open('test.asm', 'r'))
 
         self.parser.advance()
         self.parser.commandType()
