@@ -10,10 +10,10 @@ def main():
     print("usage: python vmtranslator.py filename")
     return
 
-  f = open(sys.argv[1], 'r')
+  f = open(sys.argv[1], 'r', encoding="utf-8")
   p = vm_parser.Parser(f)
   output_file_name = sys.argv[1].split(".")[0] + ".asm"
-  o = open(output_file_name, 'w')
+  o = open(output_file_name, 'w', encoding="utf-8")
   c = codewriter.CodeWriter(o)
 
   while True:
@@ -37,4 +37,3 @@ def main():
 
 if __name__ == '__main__':
   main()
-

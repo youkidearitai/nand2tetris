@@ -44,11 +44,6 @@ class CodeWriter:
         """
         self.stream = stream
         self.jmpAddr = 0
-        segment = "constant"
-        self.stream.write("@{0} // {0}(RAM[{0}])をDレジスタに一時退避\n".format(self.segment[segment]))
-        self.stream.write("D=A\n")
-        self.stream.write("@SP // スタックポインタを{0}に設定する\n".format(self.segment[segment]))
-        self.stream.write("M=D // RAM[0]に{0}を入れる\n".format(self.segment[segment]))
 
     def setFileName(self, fileName):
         """
@@ -63,7 +58,6 @@ class CodeWriter:
         それを書き込む
         """
 
-        # TODO:今現在はSimpleAddのみテストしよう
         if command == "add":
             self.stream.write("// addコマンド\n")
             self.stream.write("@SP // popするのでアドレスを1減らす\n")
@@ -315,4 +309,3 @@ class CodeWriter:
         出力ファイルを閉じる
         """
         self.stream.close()
-

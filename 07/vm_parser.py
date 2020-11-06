@@ -32,6 +32,8 @@ class Parser:
     # 無視する文字列の正規表現
     delete_rex = None
 
+    is_eof = False
+
     def __init__(self, stream):
         """入力ファイル/ストリームを開きパースを行う準備をする
 
@@ -44,6 +46,7 @@ class Parser:
         self.stream = stream
         self.delete_rex = re.compile('(?://.*)')
 
+
     def hasMoreCommands(self):
         """
         入力にまだコマンドが存在するか？
@@ -51,7 +54,7 @@ class Parser:
         Return value:
         bool -- 入力にまだコマンドが存在するか
         """
-        return self.nowline != '' # 空文字列だともうない。空行の場合は\nが入るため
+        return not self.is_eof
 
     def advance(self):
         """
@@ -59,7 +62,11 @@ class Parser:
         このルーチンはhasMoreCommands()がtrueの場合のみ
         呼ぶようにする。最初は現コマンドは空である。
         """
-        self.nowline = self.stream.readline().strip()
+
+        nowline = self.stream.readline()
+        self.is_eof = not nowline
+        self.nowline = nowline.strip()
+
         nowline = self.delete_rex.sub("", self.nowline)
         self.commands = nowline.split(" ")
 
@@ -117,4 +124,3 @@ class Parser:
 
 class NotCommandErrorException(Exception):
     pass
-
