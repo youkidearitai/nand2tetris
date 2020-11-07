@@ -11,6 +11,9 @@ M=M+1 // SPレジスタ(RAM[256])に1を追加してDレジスタに退避
 M=M-1
 @3
 M=D
+@SP
+A=M
+M=D
 // push constant 3040 コマンド
 @3040 // 3040をpushする
 D=A
@@ -23,6 +26,9 @@ M=M+1 // SPレジスタ(RAM[256])に1を追加してDレジスタに退避
 @SP
 M=M-1
 @4
+M=D
+@SP
+A=M
 M=D
 // push constant 32 コマンド
 @32 // 32をpushする

@@ -161,6 +161,9 @@ M=M+1 // SPレジスタ(RAM[256])に1を追加してDレジスタに退避
 M=M-1
 @11
 M=D
+@SP
+A=M
+M=D
 // push local 0 コマンド
 @LCL
 A=M
