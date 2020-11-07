@@ -53,7 +53,7 @@ M=D
 A=M
 M=D
 // push static 3 コマンド
-@None.3
+@StaticTest.3
 D=M
 @19
 D=M
@@ -63,7 +63,7 @@ M=D
 @SP
 M=M+1
 // push static 1 コマンド
-@None.1
+@StaticTest.1
 D=M
 @17
 D=M
@@ -81,7 +81,7 @@ D=M // DレジスタにRAM[SP]の中身を退避させる
 A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる
 M=M-D // RAM[SP] - RAM[SP-1]
 // push static 8 コマンド
-@None.8
+@StaticTest.8
 D=M
 @24
 D=M
