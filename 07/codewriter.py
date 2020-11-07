@@ -287,28 +287,36 @@ class CodeWriter:
         C_PUSHまたはC_POPコマンドをアセンブリコードに変換し、
         それを書き込む
         """
-        # TODO:現在のところは push constant nのみ
         if c_command == "push":
-            if segment == "constant":
+            if segment == "constant" or \
+               segment == "local" or \
+               segment == "argument" or \
+               segment == "this" or \
+               segment == "that" or \
+               segment == "pointer" or segment == "temp":
                 self.writePushCommand(segment, index)
-            elif segment == "local" or \
-                    segment == "argument" or \
-                    segment == "this" or \
-                    segment == "that":
-                self.writePushCommand(segment, index)
-            elif segment == "pointer" or segment == "temp":
-                self.writePushCommand(segment, index)
+            else:
+                raise UndefinedSymbolException("Undefined push symbol: {}".format(segment))
         elif c_command == "pop":
             if segment == "local" or \
                     segment == "argument" or \
                     segment == "this" or \
-                    segment == "that":
+                    segment == "that" or \
+                    segment == "pointer" or segment == "temp":
                 self.writePopCommand(segment, index)
-            elif segment == "pointer" or segment == "temp":
-                self.writePopCommand(segment, index)
+            else:
+                raise UndefinedSymbolException("Undefined pop symbol: {}".format(segment))
+        else:
+            raise UndefinedCommandException("Undefined command: {}".format(c_command))
 
     def close(self):
         """
         出力ファイルを閉じる
         """
         self.stream.close()
+
+class UndefinedCommandException(Exception):
+    pass
+
+class UndefinedSymbolException(Exception):
+    pass
