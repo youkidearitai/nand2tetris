@@ -7,12 +7,11 @@ import sys
 import os
 import glob
 
-def compileFile(filename):
+def compileFile(filename, destination, o):
   f = open(filename, 'r', encoding="utf-8")
   p = vm_parser.Parser(f)
   fileSymbol = filename.split(".")[0]
-  output_file_name = fileSymbol + ".asm"
-  o = open(output_file_name, 'w', encoding="utf-8")
+
   c = codewriter.CodeWriter(o)
   c.setFileName(os.path.basename(fileSymbol))
 
@@ -42,15 +41,22 @@ def main():
     return
 
   filename = sys.argv[1]
+  destination = filename.split(".")[0]
 
   if filename.endswith(".vm"):
       vms = [filename]
+
+      output_file_name = filename.split('.')[0] + ".asm"
+      output_file = open(output_file_name, 'w', encoding="utf-8")
   else:
       # ディレクトリなどの場合は複数コンパイルを試みる
       vms = glob.glob("{0}/*.vm".format(os.path.dirname(filename)))
 
+      output_file_name = os.path.split(filename.strip('/'))[-1].split('.')[0] + ".asm"
+      output_file = open(destination + output_file_name, 'w', encoding="utf-8")
+
   for vm in vms:
-      compileFile(vm)
+      compileFile(vm, destination, output_file)
 
 if __name__ == '__main__':
   main()
