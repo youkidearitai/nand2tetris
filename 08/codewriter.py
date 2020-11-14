@@ -40,6 +40,8 @@ class CodeWriter:
     # ジャンプアドレス
     jmpAddr = 0
 
+    labelNum = 0
+
     def __init__(self, stream):
         """
         出力ファイル・ストリームを開き書き込む準備を行う
@@ -330,10 +332,175 @@ class CodeWriter:
         else:
             raise UndefinedCommandException("Undefined command: {}".format(c_command))
 
+    def writeInit(self):
+        """
+        VMの初期化を行うアセンブリコードを書く
+        (ブートストラップ)
+        """
+        self.stream.write("// writeInit コマンド\n")
+        self.stream.write("@256\n")
+        self.stream.write("D=A\n")
+        self.stream.write("@SP\n")
+        self.stream.write("M=D\n")
+        self.writeCall("Sys.init", 0)
+
+    def writeFunction(self, f, k):
+        """
+        k個のローカル変数を持つ関数fを宣言する
+        """
+        self.stream.write("// writeFunction {0} {1} コマンド\n".format(f, k))
+        self.writeLabel("{0}".format(f))
+
+        for i in range(int(k)):
+            self.stream.write("@SP\n")
+            self.stream.write("A=M\n")
+            self.stream.write("M=D\n")
+            self.stream.write("@SP\n")
+            self.stream.write("M=M+1\n")
+
+    def getNewCallLabel(self, f):
+        self.labelNum += 1
+        return "_CALL_{0}{1}".format(f, self.labelNum)
+
+    def writeCall(self, f, n):
+        """
+        n個の引数がスタックにプッシュされた後に
+        関数fが呼ばれる
+        """
+        return_address_label = self.getNewCallLabel(f)
+        self.stream.write("// writeCall {0} {1} コマンド\n".format(f, n))
+        self.stream.write("// push return-address コマンド\n")
+        self.stream.write("@{0}\n".format(return_address_label))
+        self.stream.write("D=A\n")
+        self.stream.write("@SP\n")
+        self.stream.write("A=M\n")
+        self.stream.write("M=D\n")
+        self.stream.write("@SP\n")
+        self.stream.write("M=M+1\n")
+        self.stream.write("// push LCL コマンド\n")
+        self.stream.write("@LCL\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@SP\n")
+        self.stream.write("A=M\n")
+        self.stream.write("M=D\n")
+        self.stream.write("@SP\n")
+        self.stream.write("M=M+1\n")
+        self.stream.write("// push ARG コマンド\n")
+        self.stream.write("@ARG\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@SP\n")
+        self.stream.write("A=M\n")
+        self.stream.write("M=D\n")
+        self.stream.write("@SP\n")
+        self.stream.write("M=M+1\n")
+        self.stream.write("// push THIS コマンド\n")
+        self.stream.write("@THIS\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@SP\n")
+        self.stream.write("A=M\n")
+        self.stream.write("M=D\n")
+        self.stream.write("@SP\n")
+        self.stream.write("M=M+1\n")
+        self.stream.write("// push THAT コマンド\n")
+        self.stream.write("@THAT\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@SP\n")
+        self.stream.write("A=M\n")
+        self.stream.write("M=D\n")
+        self.stream.write("@SP\n")
+        self.stream.write("M=M+1\n")
+        self.stream.write("// ARG = SP - n - 5\n")
+        self.stream.write("@SP\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@5\n")
+        self.stream.write("D=D-A\n")
+        self.stream.write("@{0}\n".format(n))
+        self.stream.write("D=D-A\n")
+        self.stream.write("@ARG\n")
+        self.stream.write("M=D\n")
+        self.stream.write("// LCL = SP\n")
+        self.stream.write("@SP\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@LCL\n")
+        self.stream.write("M=D\n")
+        self.stream.write("// goto {0}\n".format(f))
+        self.stream.write("@{0}\n".format(f))
+        self.stream.write("0;JMP\n")
+        self.stream.write("({0})\n".format(return_address_label))
+
+    def writeReturn(self):
+        """
+        関数からのリターン
+        """
+        self.stream.write("// writeReturn コマンド\n")
+        self.stream.write("// FRAME = LCL FRAME = R13\n")
+        self.stream.write("@LCL\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@R13\n")
+        self.stream.write("M=D\n")
+        self.stream.write("// RET = *(FRAME - 5)\n")
+        self.stream.write("@5\n")
+        self.stream.write("D=A\n")
+        self.stream.write("@R13\n")
+        self.stream.write("A=M-D\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@R14\n")
+        self.stream.write("M=D\n")
+
+        self.stream.write("// *ARG = pop()\n")
+        self.stream.write("@SP\n")
+        self.stream.write("M=M-1\n")
+        self.stream.write("A=M\n")
+
+        self.stream.write("D=M\n")
+        self.stream.write("@ARG\n")
+        self.stream.write("A=M\n")
+        self.stream.write("M=D\n")
+
+        self.stream.write("// SP = ARG+1\n")
+        self.stream.write("@ARG\n")
+        self.stream.write("D=M+1\n")
+        self.stream.write("@SP\n")
+        self.stream.write("M=D\n")
+
+        self.stream.write("// THAT = *(FRAME - 1)\n")
+        self.stream.write("@R13\n")
+        self.stream.write("AM=M-1\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@THAT\n")
+        self.stream.write("M=D\n")
+
+        self.stream.write("// THIS = *(FRAME - 2)\n")
+        self.stream.write("@R13\n")
+        self.stream.write("AM=M-1\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@THIS\n")
+        self.stream.write("M=D\n")
+
+        self.stream.write("// ARG = *(FRAME - 3)\n")
+        self.stream.write("@R13\n")
+        self.stream.write("AM=M-1\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@ARG\n")
+        self.stream.write("M=D\n")
+
+        self.stream.write("// LCL = *(FRAME - 4)\n")
+        self.stream.write("@R13\n")
+        self.stream.write("AM=M-1\n")
+        self.stream.write("D=M\n")
+        self.stream.write("@LCL\n")
+        self.stream.write("M=D\n")
+
+        self.stream.write("// goto RET\n")
+        self.stream.write("@R14\n")
+        self.stream.write("A=M\n")
+        self.stream.write("0;JMP\n")
+
     def writeLabel(self, label):
         """
         labelコマンドを行うアセンブリコード
         """
+        self.stream.write("// writeLabel {0} コマンド\n".format(label))
         self.checkLabel(label)
         self.stream.write("// label {0} コマンド\n".format(label))
         self.stream.write("({0})\n".format(label))
@@ -342,13 +509,15 @@ class CodeWriter:
         """
         labelをチェックする
         """
-        if not re.match('[_.:A-Za-z][_.:A-Za-z0-9]+', label):
-            raise UndefinedCommandException("Undefined label: {}".format(label))
+        if not re.match('[_.:A-Za-z][_.:A-Za-z0-9$]+', label):
+            #raise UndefinedCommandException("Undefined label: {}".format(label))
+            pass
 
     def writeGoto(self, label):
         """
         gotoコマンドを行うアセンブリコード
         """
+        self.stream.write("// writeGoto {0} コマンド\n".format(label))
         self.checkLabel(label)
         self.stream.write("// goto {0} コマンド\n".format(label))
         self.stream.write("@{0}\n".format(label))
@@ -358,6 +527,7 @@ class CodeWriter:
         """
         if-goto コマンドを行うアセンブリコード
         """
+        self.stream.write("// writeIf {0} コマンド\n".format(label))
         self.checkLabel(label)
         self.stream.write("// if-goto {0} コマンド\n".format(label))
         self.writePushpop("pop", "global", None)

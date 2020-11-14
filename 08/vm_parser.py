@@ -105,6 +105,12 @@ class Parser:
             self.command_type = C_IF
         elif self.commands[0] == "goto":
             self.command_type = C_GOTO
+        elif self.commands[0] == "function":
+            self.command_type = C_FUNCTION
+        elif self.commands[0] == "return":
+            self.command_type = C_RETURN
+        elif self.commands[0] == "call":
+            self.command_type = C_CALL
         else:
             raise NotCommandErrorException("no command", self.commands[0])
 

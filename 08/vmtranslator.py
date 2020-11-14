@@ -7,12 +7,11 @@ import sys
 import os
 import glob
 
-def compileFile(filename, destination, o):
+def compileFile(filename, destination, c, o):
   f = open(filename, 'r', encoding="utf-8")
   p = vm_parser.Parser(f)
   fileSymbol = filename.split(".")[0]
 
-  c = codewriter.CodeWriter(o)
   c.setFileName(os.path.basename(fileSymbol))
 
   while True:
@@ -43,6 +42,15 @@ def compileFile(filename, destination, o):
     if command_type == vm_parser.C_GOTO:
         c.writeGoto(p.arg1())
 
+    if command_type == vm_parser.C_FUNCTION:
+        c.writeFunction(p.arg1(), p.arg2())
+
+    if command_type == vm_parser.C_RETURN:
+        c.writeReturn()
+
+    if command_type == vm_parser.C_CALL:
+        c.writeCall(p.arg1(), p.arg2())
+
 
 def main():
   if len(sys.argv) < 2:
@@ -64,8 +72,11 @@ def main():
       output_file_name = os.path.split(filename.strip('/'))[-1].split('.')[0] + ".asm"
       output_file = open(destination + output_file_name, 'w', encoding="utf-8")
 
+  c = codewriter.CodeWriter(output_file)
+  c.writeInit()
+
   for vm in vms:
-      compileFile(vm, destination, output_file)
+      compileFile(vm, destination, c, output_file)
 
 if __name__ == '__main__':
   main()
