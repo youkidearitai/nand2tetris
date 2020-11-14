@@ -349,7 +349,7 @@ class CodeWriter:
         k個のローカル変数を持つ関数fを宣言する
         """
         self.stream.write("// writeFunction {0} {1} コマンド\n".format(f, k))
-        self.writeLabel("{0}".format(f))
+        self.stream.write("({0})\n".format(f))
 
         for i in range(int(k)):
             self.stream.write("@SP\n")
@@ -500,38 +500,24 @@ class CodeWriter:
         """
         labelコマンドを行うアセンブリコード
         """
-        self.stream.write("// writeLabel {0} コマンド\n".format(label))
-        self.checkLabel(label)
         self.stream.write("// label {0} コマンド\n".format(label))
-        self.stream.write("({0})\n".format(label))
-
-    def checkLabel(self, label):
-        """
-        labelをチェックする
-        """
-        if not re.match('[_.:A-Za-z][_.:A-Za-z0-9$]+', label):
-            #raise UndefinedCommandException("Undefined label: {}".format(label))
-            pass
+        self.stream.write("({0}${1})\n".format(self.fileName, label))
 
     def writeGoto(self, label):
         """
         gotoコマンドを行うアセンブリコード
         """
-        self.stream.write("// writeGoto {0} コマンド\n".format(label))
-        self.checkLabel(label)
         self.stream.write("// goto {0} コマンド\n".format(label))
-        self.stream.write("@{0}\n".format(label))
+        self.stream.write("@{0}${1}\n".format(self.fileName, label))
         self.stream.write("0;JMP\n")
 
     def writeIf(self, label):
         """
         if-goto コマンドを行うアセンブリコード
         """
-        self.stream.write("// writeIf {0} コマンド\n".format(label))
-        self.checkLabel(label)
         self.stream.write("// if-goto {0} コマンド\n".format(label))
         self.writePushpop("pop", "global", None)
-        self.stream.write("@{0}\n".format(label))
+        self.stream.write("@{0}${1}\n".format(self.fileName, label))
         self.stream.write("D;JNE\n")
 
     def close(self):

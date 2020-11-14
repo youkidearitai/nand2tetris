@@ -63,8 +63,6 @@ M=D
 0;JMP
 (_CALL_Sys.init1)
 // writeFunction Main.fibonacci 0 コマンド
-// writeLabel Main.fibonacci コマンド
-// label Main.fibonacci コマンド
 (Main.fibonacci)
 // push argument 0 コマンド
 @ARG
@@ -105,22 +103,19 @@ M=0
   A=D-1
   M=-1
 (GTHAN_EQ_END0)
-// writeIf IF_TRUE コマンド
 // if-goto IF_TRUE コマンド
 // pop global コマンド
 @SP // global スタックポインタをセットする
 M=M-1
 A=M
 D=M
-@IF_TRUE
+@Main$IF_TRUE
 D;JNE
-// writeGoto IF_FALSE コマンド
 // goto IF_FALSE コマンド
-@IF_FALSE
+@Main$IF_FALSE
 0;JMP
-// writeLabel IF_TRUE コマンド
 // label IF_TRUE コマンド
-(IF_TRUE)
+(Main$IF_TRUE)
 // push argument 0 コマンド
 @ARG
 A=M
@@ -185,9 +180,8 @@ M=D
 @R14
 A=M
 0;JMP
-// writeLabel IF_FALSE コマンド
 // label IF_FALSE コマンド
-(IF_FALSE)
+(Main$IF_FALSE)
 // push argument 0 コマンド
 @ARG
 A=M
@@ -420,8 +414,6 @@ M=D
 A=M
 0;JMP
 // writeFunction Sys.init 0 コマンド
-// writeLabel Sys.init コマンド
-// label Sys.init コマンド
 (Sys.init)
 // push constant 4 コマンド
 @4 // 4をpushする
@@ -490,10 +482,8 @@ M=D
 @Main.fibonacci
 0;JMP
 (_CALL_Main.fibonacci4)
-// writeLabel WHILE コマンド
 // label WHILE コマンド
-(WHILE)
-// writeGoto WHILE コマンド
+(Sys$WHILE)
 // goto WHILE コマンド
-@WHILE
+@Sys$WHILE
 0;JMP
