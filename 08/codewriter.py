@@ -238,8 +238,6 @@ class CodeWriter:
             self.stream.write("// push {0} {1} コマンド\n".format(segment, index))
             self.stream.write("@{0}.{1}\n".format(self.fileName, index))
             self.stream.write("D=M\n")
-            self.stream.write("@{0}\n".format(int(index) + self.segment[segment]))
-            self.stream.write("D=M\n")
             self.stream.write("@SP\n")
             self.stream.write("A=M\n")
             self.stream.write("M=D\n")
@@ -290,7 +288,7 @@ class CodeWriter:
             self.stream.write("M=M-1\n")
             self.stream.write("A=M\n")
             self.stream.write("D=M\n")
-            self.stream.write("@{0}\n".format(self.segment[segment] + int(index)))
+            self.stream.write("@{0}.{1}\n".format(self.fileName, index))
             self.stream.write("M=D\n")
         else: # global
             ptr = "SP"

@@ -1,17 +1,15 @@
-// label SimpleFunction.test.2 コマンド
-(SimpleFunction.test.2)
-@LCL
-A=M
-M=0
-A=A+1
-M=0
-A=A+1
+// writeFunction SimpleFunction.test 2 コマンド
+(SimpleFunction.test)
 @SP
-M=M+1
+A=M
+M=D
 @SP
 M=M+1
 @SP
 A=M
+M=D
+@SP
+M=M+1
 // push local 0 コマンド
 @LCL
 A=M
@@ -81,19 +79,17 @@ A=D // アドレスをRAM[SP]に変更する
 D=M // DレジスタにRAM[SP]の中身を退避させる
 A=A-1 // RAM[SP-1]の中身をみるためにアドレスを減算させる
 M=M-D // RAM[SP] - RAM[SP-1]
+// writeReturn コマンド
 // FRAME = LCL FRAME = R13
 @LCL
 D=M
 @R13
 M=D
 // RET = *(FRAME - 5)
+@5
+D=A
 @R13
-D=D-1
-D=D-1
-D=D-1
-D=D-1
-D=D-1
-A=D
+A=M-D
 D=M
 @R14
 M=D
