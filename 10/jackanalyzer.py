@@ -11,4 +11,6 @@ if __name__ == '__main__':
     for src in glob.glob(args.source):
         fp = open(src)
         jk = jacktokenizer.JackTokenizer(fp)
-        print(jk)
+        while jk.hasMoreTokens():
+            jk.advance()
+    print("End Analyze.")

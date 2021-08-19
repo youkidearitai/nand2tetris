@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 class JackTokenizer:
-    self.KEYWORD = 0
-    self.SYMBOL = 1
-    self.IDENTIFIER = 2
-    self.INT_CONST = 3
-    self.STRING_CONST = 4
+    KEYWORD = 0
+    SYMBOL = 1
+    IDENTIFIER = 2
+    INT_CONST = 3
+    STRING_CONST = 4
+
+    tokens = []
 
     def __init__(self, fp):
         """
