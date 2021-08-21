@@ -9,6 +9,8 @@ class JackTokenizer:
 
     tokens = []
 
+    pointer = None
+
     def __init__(self, fp):
         """
         コンストラクタ
@@ -21,7 +23,7 @@ class JackTokenizer:
         """
         入力にまだトークンは存在するか？
         """
-        return False
+        return self.pointer != ''
 
     def advance(self):
         """
@@ -30,7 +32,7 @@ class JackTokenizer:
         hasMoreTokensがtrueの間呼び出す
         最初は現在のトークンを設定していない
         """
-        pass
+        self.pointer = self.fp.read(1)
 
     def tokenType(self):
         """

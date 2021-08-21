@@ -13,4 +13,5 @@ if __name__ == '__main__':
         jk = jacktokenizer.JackTokenizer(fp)
         while jk.hasMoreTokens():
             jk.advance()
+            print(jk.pointer)
     print("End Analyze.")
