@@ -9,7 +9,55 @@ class JackTokenizer:
 
     tokens = []
 
+    keywords = [
+        'class',
+        'constructor',
+        'function',
+        'method',
+        'field',
+        'static',
+        'var',
+        'int',
+        'char',
+        'boolean',
+        'void',
+        'true',
+        'false',
+        'null',
+        'this',
+        'let',
+        'do',
+        'if',
+        'else',
+        'while',
+        'return'
+    ]
+
+    symbols = [
+        '{',
+        '}',
+        '(',
+        ')',
+        '[',
+        ']',
+        '.',
+        ',',
+        ';',
+        '+',
+        '-',
+        '*',
+        '/',
+        '&',
+        '|',
+        '<',
+        '>',
+        '=',
+        '~'
+    ]
+
     pointer = None
+    now_token = ""
+    token_type = None
 
     def __init__(self, fp):
         """
@@ -18,6 +66,12 @@ class JackTokenizer:
         fp: 入力ファイル/ストリーム
         """
         self.fp = fp
+
+    def parseEnd(self):
+        """
+        パース終了
+        """
+        self.fp.close()
 
     def hasMoreTokens(self):
         """
@@ -33,26 +87,41 @@ class JackTokenizer:
         最初は現在のトークンを設定していない
         """
         self.pointer = self.fp.read(1)
+        if self.pointer in self.symbols:
+            self.now_token = self.pointer
+            self.token_type = self.SYMBOL
+            self.tokens.append(self.now_token)
+            self.now_token = ""
+            return
+
+        if not self.pointer.isspace():
+            self.now_token += self.pointer
+
+        if self.now_token in self.keywords:
+            self.token_type = self.KEYWORD
+            self.tokens.append(self.now_token)
+            self.now_token = ""
+            return
 
     def tokenType(self):
         """
         現トークンの種類を返す
         """
-        return self.KEYWORD
+        return self.token_type
 
     def keyword(self):
         """
         現トークンのキーワードを返す
         これはtokenType()が、KEYWORDのみ呼び出す
         """
-        return 0
+        return self.tokens[-1]
 
     def symbol(self):
         """
         現トークンの文字を返す
         tokenTypeがSYMBOLのみ呼び出す
         """
-        return ""
+        return self.tokens[-1]
 
     def identifier(self):
         """
