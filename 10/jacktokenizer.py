@@ -103,6 +103,14 @@ class JackTokenizer:
             self.now_token = ""
             return
 
+        if self.now_token.isdigit():
+            self.token_type = self.INT_CONST
+            self.tokens.append(self.now_token)
+            self.now_token = ""
+            return
+
+        self.token_type = None
+
     def tokenType(self):
         """
         現トークンの種類を返す
@@ -135,7 +143,7 @@ class JackTokenizer:
         現トークンの整数の値を返す
         tokenType()がINT_CONSTの場合のみ呼び出す
         """
-        return 0
+        return int(self.tokens[-1])
 
     def stringVal(self):
         """

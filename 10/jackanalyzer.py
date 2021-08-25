@@ -11,9 +11,24 @@ if __name__ == '__main__':
     for src in glob.glob(args.source):
         fp = open(src)
         jk = jacktokenizer.JackTokenizer(fp)
+        tokens = []
         while jk.hasMoreTokens():
             jk.advance()
 
+            tokenType = jk.tokenType()
+            if tokenType == jk.KEYWORD:
+                tokens.append(jk.keyword())
+            elif tokenType == jk.SYMBOL:
+                tokens.append(jk.symbol())
+            elif tokenType == jk.IDENTIFIER:
+                pass
+            elif tokenType == jk.INT_CONST:
+                tokens.append(jk.intVal())
+            elif tokenType == jk.STRING_CONST:
+                pass
+
+
     print(jk.tokens)
+    print(tokens)
     jk.parseEnd()
     print("End Analyze.")
