@@ -111,14 +111,12 @@ class JackTokenizer:
                 self.pointer = self.fp.read(1)
 
                 if not self.pointer.isdigit():
-                    print(self.now_token)
                     break
                 else:
                     self.now_token += self.pointer
 
             self.tokens.append(self.now_token)
 
-            print(self.fp.tell())
             self.fp.seek(self.fp.tell() - 1, 0)
             self.now_token = ""
             return
