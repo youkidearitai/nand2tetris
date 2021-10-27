@@ -87,6 +87,7 @@ class JackTokenizer:
         最初は現在のトークンを設定していない
         """
         self.pointer = self.fp.read(1)
+
         if self.pointer in self.symbols:
             self.now_token = self.pointer
             self.token_type = self.SYMBOL
@@ -103,9 +104,22 @@ class JackTokenizer:
             self.now_token = ""
             return
 
-        if self.now_token.isdigit():
+        if self.pointer.isdigit():
             self.token_type = self.INT_CONST
+
+            while True:
+                self.pointer = self.fp.read(1)
+
+                if not self.pointer.isdigit():
+                    print(self.now_token)
+                    break
+                else:
+                    self.now_token += self.pointer
+
             self.tokens.append(self.now_token)
+
+            print(self.fp.tell())
+            self.fp.seek(self.fp.tell() - 1, 0)
             self.now_token = ""
             return
 
