@@ -121,6 +121,22 @@ class JackTokenizer:
             self.now_token = ""
             return
 
+        if self.pointer == '"':
+            self.token_type = self.STRING_CONST
+            self.now_token = ""
+
+            while True:
+                self.pointer = self.fp.read(1)
+
+                if self.pointer == '"':
+                    break
+                else:
+                    self.now_token += self.pointer
+
+            self.tokens.append(self.now_token)
+            self.now_token = ""
+            return
+
         self.token_type = None
 
     def tokenType(self):
@@ -162,4 +178,4 @@ class JackTokenizer:
         現トークンの文字列を返す
         tokenType()がSTRING_CONSTの場合のみ呼び出す
         """
-        return ""
+        return self.tokens[-1]
