@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import binascii
+
 class JackTokenizer:
     KEYWORD = 0
     SYMBOL = 1
@@ -104,6 +106,18 @@ class JackTokenizer:
             self.now_token = ""
             return
 
+        nextChar = self.fp.read(1)
+        # eofに到達した場合
+        if nextChar == '':
+            return
+
+        self.fp.seek(self.fp.tell() - 1, 0)
+        if nextChar in self.symbols:
+            self.token_type = self.IDENTIFIER
+            self.tokens.append(self.now_token)
+            self.now_token = ""
+            return
+
         if self.pointer.isdigit():
             self.token_type = self.INT_CONST
 
@@ -164,7 +178,7 @@ class JackTokenizer:
         現トークンの識別子を返す
         tokenType()がIDENTIFIERの場合のみ呼び出す
         """
-        return ""
+        return self.tokens[-1]
 
     def intVal(self):
         """

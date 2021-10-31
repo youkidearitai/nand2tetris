@@ -21,7 +21,7 @@ if __name__ == '__main__':
             elif tokenType == jk.SYMBOL:
                 tokens.append(jk.symbol())
             elif tokenType == jk.IDENTIFIER:
-                pass
+                tokens.append(jk.identifier())
             elif tokenType == jk.INT_CONST:
                 tokens.append(jk.intVal())
             elif tokenType == jk.STRING_CONST:
