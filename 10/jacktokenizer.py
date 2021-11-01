@@ -112,13 +112,13 @@ class JackTokenizer:
             return
 
         self.fp.seek(self.fp.tell() - 1, 0)
-        if nextChar in self.symbols:
+        if nextChar in self.symbols and self.now_token != "":
             self.token_type = self.IDENTIFIER
             self.tokens.append(self.now_token)
             self.now_token = ""
             return
 
-        if self.pointer.isdigit():
+        if self.pointer.isdigit() and self.now_token == "":
             self.token_type = self.INT_CONST
 
             while True:
